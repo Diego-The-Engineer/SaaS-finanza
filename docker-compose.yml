@@ -1,0 +1,38 @@
+version: '3.3'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: db_finanzas
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: secretpassword
+      POSTGRES_DB: finanzas_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    container_name: api_finanzas
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: postgresql://admin:secretpassword@db:5432/finanzas_db
+
+  frontend:
+    image: nginx:alpine
+    container_name: web_server
+    ports:
+      - "80:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html:z
+      - ./nginx.conf:/etc/nginx/nginx.conf:z
+    depends_on:
+      - backend 
+
+volumes:
+  pgdata:

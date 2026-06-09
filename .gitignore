@@ -1,0 +1,7 @@
+# Carpetas de datos locales
+db_data/
+venv/
+__pycache__/
+.env
+*.log
+.DS_Store
