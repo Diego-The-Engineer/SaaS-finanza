@@ -85,5 +85,18 @@ async function verificarConexion() {
     }
 }
 
+async function cargarConceptos() {
+    try {
+        // Usa la URL completa aquí, no la ruta relativa
+        const response = await fetch(`${API_BASE}/api/conceptos`); 
+        if (!response.ok) throw new Error('Error al conectar');
+        const data = await response.json();
+        catalogo = data; // Actualiza tu catálogo
+        actualizarMenuConceptos(); // Refresca el dropdown
+    } catch (error) {
+        console.error("Error:", error);
+    }
+}
+
 // Ejecútala al cargar la página
 document.addEventListener('DOMContentLoaded', verificarConexion);
