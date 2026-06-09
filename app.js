@@ -24,7 +24,7 @@ async function verificarConexion() {
     try {
         const response = await fetch(`${API_BASE_URL}/conceptos`);
         if (response.ok) {
-            console.log("¡Conexión exitosa! Base de datos lista.");
+            console.log("Conexion exitosa. Base de datos lista.");
             return true;
         }
         return false;
@@ -60,7 +60,6 @@ async function cargarMovimientos() {
     let query = `?${filtroActual ? 'tipo='+filtroActual : ''}&${mes ? 'mes='+mes : ''}`;
     const movs = await api.get(`/transacciones${query}`);
     
-    // Aquí es donde ocurría el error si las funciones de abajo no existían
     renderizarLista(movs);
     actualizarGraficas(movs);
 }
@@ -81,10 +80,6 @@ async function eliminar(id) {
     await api.delete(`/transacciones/${id}`);
     await cargarMovimientos();
 }
-
-// =====================================================================
-// ESTAS SON LAS FUNCIONES QUE FALTABAN: Asegúrate de copiar hasta el final
-// =====================================================================
 
 function renderizarLista(movs) {
     const lista = document.getElementById('lista-movimientos');
