@@ -13,6 +13,10 @@ const api = {
 let catalogo = [], filtroActual = '', graficoIng = null, graficoEgr = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
+    const inputFecha = document.getElementById('fecha');
+    if (inputFecha) {
+        inputFecha.value = new Date().toISOString().split('T')[0];
+    }
     const conexionExitosa = await verificarConexion();
     if (conexionExitosa) {
         catalogo = await api.get('/conceptos');
@@ -73,9 +77,14 @@ document.getElementById('form-movimiento')?.addEventListener('submit', async (e)
         id_tipo: document.getElementById('id_tipo').value,
         id_concepto: parseInt(document.getElementById('id_concepto').value),
         monto: parseFloat(document.getElementById('monto').value),
-        notas: document.getElementById('notas').value
+        notas: document.getElementById('notas').value,
+        fecha: document.getElementById('fecha').value
     });
     e.target.reset();
+    const inputFecha = document.getElementById('fecha');
+    if (inputFecha) {
+        inputFecha.value = new Date().toISOString().split('T')[0];
+    }
     await cargarMovimientos();
 });
 

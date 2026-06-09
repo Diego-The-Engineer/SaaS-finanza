@@ -54,7 +54,7 @@ class TransaccionCreate(BaseModel):
     id_concepto: int
     monto: float
     notas: Optional[str] = None
-
+    fecha: Optional[date] = None
 # Dependencia DB
 def get_db():
     db = SessionLocal()
