@@ -5,7 +5,24 @@ from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 import datetime
+import os
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
+if not DATABASE_URL:
+
+    raise ValueError("No se ha configurado la variable de entorno DATABASE_URL")
+
+engine = create_engine(DATABASE_URL)
+
+# En tu main.py (FastAPI)
+from fastapi.middleware.cors import CORSMiddleware
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["https://diego-the-engineer.github.io"], # Tu sitio
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # 1. Configuración de la Conexión a la Base de Datos
 DATABASE_URL = "postgresql://admin:secretpassword@db:5432/finanzas_db"
 engine = create_engine(DATABASE_URL)
