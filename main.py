@@ -23,7 +23,7 @@ app = FastAPI(title="SaaS Finanzas MVP - Fase 2")
 # Middleware CORS (Debe ir después de definir app)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://diego-the-engineer.github.io"], 
+    allow_origins=["*"], 
     allow_methods=["*"],
     allow_headers=["*"],
 )

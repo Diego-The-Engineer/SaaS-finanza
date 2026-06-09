@@ -63,3 +63,27 @@ document.getElementById('form-movimiento').addEventListener('submit', async (e) 
     e.target.reset(); 
     cargarMovimientos();
 });
+
+async function verificarConexion() {
+    console.log("Iniciando prueba de conexión con el backend...");
+    try {
+        // Probamos una ruta que sabemos que existe en tu main.py
+        const response = await fetch(`${API_BASE_URL}/conceptos`);
+        
+        if (response.ok) {
+            const data = await response.json();
+            console.log("¡Conexión exitosa! Datos recibidos:", data);
+            alert("¡Backend conectado correctamente! Revisa la consola (F12) para ver los datos.");
+            return true;
+        } else {
+            console.error("El backend respondió con error:", response.status);
+            return false;
+        }
+    } catch (error) {
+        console.error("Error crítico de conexión (¿CORS o red?):", error);
+        return false;
+    }
+}
+
+// Ejecútala al cargar la página
+document.addEventListener('DOMContentLoaded', verificarConexion);
