@@ -33,8 +33,3 @@ El sistema está construido bajo una arquitectura de microservicios separando la
 | `GET`  | `/transacciones` | Lista los movimientos financieros (soporta query params para filtrado). |
 | `POST` | `/transacciones` | Inserta un nuevo registro validado en la base de datos. |
 | `DELETE`| `/transacciones/{id}`| Elimina un registro financiero específico. |
-
-
-1. Clona el repositorio:
-   ```bash
-   git clone [https://github.com/tu-usuario/tu-repo.git](https://github.com/tu-usuario/tu-repo.git)
