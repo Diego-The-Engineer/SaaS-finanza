@@ -5,6 +5,8 @@
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)
 ![Render](https://img.shields.io/badge/Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)
+![openEuler](https://img.shields.io/badge/openEuler-%232D68C4.svg?style=for-the-badge&logo=openeuler&logoColor=white)
+![NGINX](https://img.shields.io/badge/nginx-%23009639.svg?style=for-the-badge&logo=nginx&logoColor=white)
 
 Plataforma SaaS (Software as a Service) de arquitectura desacoplada diseñada para el registro, control y visualización analítica de operaciones financieras en tiempo real.
 
