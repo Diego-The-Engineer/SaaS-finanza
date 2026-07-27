@@ -126,3 +126,47 @@ li {
     background-color: #dc2626; /* Rojo de advertencia para eliminar */
     color: white;
 }
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Fondo oscuro semitransparente */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-overlay .modal-content {
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+@media (max-width: 768px) {
+    .modal-overlay {
+        align-items: flex-end; 
+        padding: 0; 
+    }
+
+    .modal-overlay .modal-content {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        border-radius: 20px 20px 0 0; 
+        padding-bottom: 30px; 
+        animation: slideUpModal 0.3s ease-out;
+    }
+}
+
+@keyframes slideUpModal {
+    from {
+        transform: translateY(100%);
+    }
+    to {
+        transform: translateY(0);
+    }
+}

@@ -87,6 +87,63 @@
             <ul id="lista-movimientos"></ul>
         </div>
     </div>
+    <div id="modalAgregar" class="modal-overlay" style="display: none;">
+        <div class="modal-content card">
+            <h3>Agregar Nuevo Concepto</h3>
+            
+            <div class="form-group">
+                <label>Nombre del Concepto:</label>
+                <input type="text" id="modalNombre" placeholder="Ej. Pago de Internet">
+            </div>
+
+            <div class="form-group">
+                <label>Tipo:</label>
+                <select id="modalTipo">
+                    <option value="Ingreso">Ingreso</option>
+                    <option value="Egreso">Egreso</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Categoría Padre:</label>
+                <input type="text" id="modalCategoria" placeholder="Ej. Servicios">
+            </div>
+
+            <div class="concept-actions">
+                <button type="button" id="btnGuardarModal" class="btn-action btn-add">Guardar</button>
+                <button type="button" id="btnCancelarModal" class="btn-action btn-delete">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalActualizar" class="modal-overlay" style="display: none;">
+        <div class="modal-content card">
+            <h3>Editar concepto</h3>
+            
+            <div class="form-group">
+                <label>Nuevo nombre del Concepto:</label>
+                <input type="text" id="modalNombreActualizar" placeholder="Ej. Pago de Internet">
+            </div>
+
+            <div class="form-group">
+                <label>Tipo:</label>
+                <select id="modalTipoActualizar">
+                    <option value="Ingreso">Ingreso</option>
+                    <option value="Egreso">Egreso</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Categoría Padre:</label>
+                <input type="text" id="modalCategoriaActualizar" placeholder="Ej. Servicios">
+            </div>
+
+            <div class="concept-actions">
+                <button type="button" id="btnGuardarModalActualizar" class="btn-action btn-add">Guardar</button>
+                <button type="button" id="btnCancelarModalActualizar" class="btn-action btn-delete">Cancelar</button>
+            </div>
+        </div>
+    </div>
     <script src="app.js"></script>
 </body>
 </html>
