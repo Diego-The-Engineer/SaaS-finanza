@@ -40,7 +40,7 @@ async function verificarConexion() {
     }
 }
 
-document.getElementById("btnAgregarConcepto").addEventListener("click", () => {
+document.getElementById("btnAgregar").addEventListener("click", () => {
     const nombre = prompt("Nombre del nuevo concepto:");
     const tipo = document.getElementById("tipoInput").value; 
     const categoria = prompt("Categoría:");
@@ -50,7 +50,7 @@ document.getElementById("btnAgregarConcepto").addEventListener("click", () => {
     }
 });
 
-document.getElementById("btnActualizarConcepto").addEventListener("click", () => {
+document.getElementById("btnActualizar").addEventListener("click", () => {
     const selectConcepto = document.getElementById("selectConcepto"); 
     const idSeleccionado = selectConcepto.value;
 
@@ -70,7 +70,7 @@ document.getElementById("btnActualizarConcepto").addEventListener("click", () =>
     }
 });
 
-document.getElementById("btnEliminarConcepto").addEventListener("click", async () => {
+document.getElementById("btnEliminar").addEventListener("click", async () => {
     const selectConcepto = document.getElementById("selectConcepto");
     const idSeleccionado = selectConcepto.value;
 

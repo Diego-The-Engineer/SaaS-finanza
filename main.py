@@ -35,7 +35,7 @@ class ConceptoDB(Base):
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String, unique=True, index=True)
     tipo = Column(String) 
-    categoria = Column(String) 
+    categoria_padre = Column(String) 
 
 class MovimientoDB(Base):
     __tablename__ = "movimientos"
@@ -60,7 +60,7 @@ class TransaccionCreate(BaseModel):
 class ConceptosCreate(BaseModel):
     nombre: str
     tipo: str
-    categoria: str
+    categoria_padre: str
 
 # Dependencia DB
 def get_db():
@@ -136,7 +136,7 @@ def actualizar_concepto(id_concepto: int, concepto_in: ConceptosCreate, db: Sess
     
     db_concepto.nombre = concepto_in.nombre
     db_concepto.tipo = concepto_in.tipo
-    db_concepto.categoria = concepto_in.categoria
+    db_concepto.categoria_padre = concepto_in.categoria_padre
     
     db.commit()
     db.refresh(db_concepto)
