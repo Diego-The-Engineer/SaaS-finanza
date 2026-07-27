@@ -42,35 +42,37 @@ async function verificarConexion() {
 
 document.getElementById("btnAgregar").addEventListener("click", () => {
     const nombre = prompt("Nombre del nuevo concepto:");
-    const tipo = document.getElementById("tipoInput").value; 
-    const categoria_padre = prompt("Categoría:");
+    const tipoElement = document.getElementById("id_tipo"); 
+    const tipo = tipoElement ? tipoElement.value : "Ingreso"; 
+    
+    const categoria_padre = prompt("Categoría padre:");
+    
     if (nombre && tipo && categoria_padre) {
         crearConcepto({ nombre, tipo, categoria_padre });
     }
 });
 
-document.getElementById("btnActualizar").addEventListener("click", () => {
-    const selectConcepto = document.getElementById("selectConcepto"); 
+document.getElementById("btnEditar").addEventListener("click", () => {
+    const selectConcepto = document.getElementById("id_concepto"); 
     const idSeleccionado = selectConcepto.value;
 
     if (!idSeleccionado) {
-        alert("Selecciona un concepto para actualizar.");
+        alert("Selecciona un concepto para editar.");
         return;
     }
 
     const nuevoNombre = prompt("Nuevo nombre para el concepto:");
     if (nuevoNombre) {
         actualizarConcepto(idSeleccionado, {
-            id_concepto: parseInt(idSeleccionado),
             nombre: nuevoNombre,
-            tipo: "ingreso", 
-            categoria: "general"
+            tipo: "Ingreso", 
+            categoria_padre: "general" 
         });
     }
 });
 
 document.getElementById("btnEliminar").addEventListener("click", async () => {
-    const selectConcepto = document.getElementById("selectConcepto");
+    const selectConcepto = document.getElementById("id_concepto");
     const idSeleccionado = selectConcepto.value;
 
     if (!idSeleccionado) {
@@ -80,9 +82,10 @@ document.getElementById("btnEliminar").addEventListener("click", async () => {
 
     if (confirm("¿Estás seguro de eliminar este concepto?")) {
         await eliminarConcepto(idSeleccionado);
-        alert("Concepto eliminado");
+        alert("Concepto eliminado exitosamente");
     }
 });
+
 const idTipoSelect = document.getElementById("id_tipo");
 if (idTipoSelect) {
     idTipoSelect.addEventListener("change", actualizarMenuConceptos);
