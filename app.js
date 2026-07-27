@@ -43,10 +43,9 @@ async function verificarConexion() {
 document.getElementById("btnAgregar").addEventListener("click", () => {
     const nombre = prompt("Nombre del nuevo concepto:");
     const tipo = document.getElementById("tipoInput").value; 
-    const categoria = prompt("Categoría:");
-    const id_concepto = Math.floor(Math.random() * 1000); 
-    if (nombre && tipo && categoria) {
-        crearConcepto({ id_concepto, nombre, tipo, categoria });
+    const categoria_padre = prompt("Categoría:");
+    if (nombre && tipo && categoria_padre) {
+        crearConcepto({ nombre, tipo, categoria_padre });
     }
 });
 
@@ -84,7 +83,10 @@ document.getElementById("btnEliminar").addEventListener("click", async () => {
         alert("Concepto eliminado");
     }
 });
-
+const idTipoSelect = document.getElementById("id_tipo");
+if (idTipoSelect) {
+    idTipoSelect.addEventListener("change", actualizarMenuConceptos);
+}
 document.getElementById('id_tipo').addEventListener('change', actualizarMenuConceptos);
 
 function actualizarMenuConceptos() {
