@@ -1,5 +1,5 @@
 import os
-import datetime
+from datetime import date
 from typing import Optional
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
@@ -20,7 +20,7 @@ Base = declarative_base()
 # 2. Inicialización de la App
 app = FastAPI(title="SaaS Finanzas MVP - Fase 3")
 
-# Middleware CORS (Debe ir después de definir app)
+# Middleware CORS 
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"], 
