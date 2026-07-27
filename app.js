@@ -40,6 +40,51 @@ async function verificarConexion() {
     }
 }
 
+document.getElementById("btnAgregarConcepto").addEventListener("click", () => {
+    const nombre = prompt("Nombre del nuevo concepto:");
+    const tipo = document.getElementById("tipoInput").value; 
+    const categoria = prompt("Categoría:");
+    const id_concepto = Math.floor(Math.random() * 1000); 
+    if (nombre && tipo && categoria) {
+        crearConcepto({ id_concepto, nombre, tipo, categoria });
+    }
+});
+
+document.getElementById("btnActualizarConcepto").addEventListener("click", () => {
+    const selectConcepto = document.getElementById("selectConcepto"); 
+    const idSeleccionado = selectConcepto.value;
+
+    if (!idSeleccionado) {
+        alert("Selecciona un concepto para actualizar.");
+        return;
+    }
+
+    const nuevoNombre = prompt("Nuevo nombre para el concepto:");
+    if (nuevoNombre) {
+        actualizarConcepto(idSeleccionado, {
+            id_concepto: parseInt(idSeleccionado),
+            nombre: nuevoNombre,
+            tipo: "ingreso", 
+            categoria: "general"
+        });
+    }
+});
+
+document.getElementById("btnEliminarConcepto").addEventListener("click", async () => {
+    const selectConcepto = document.getElementById("selectConcepto");
+    const idSeleccionado = selectConcepto.value;
+
+    if (!idSeleccionado) {
+        alert("Selecciona un concepto para eliminar.");
+        return;
+    }
+
+    if (confirm("¿Estás seguro de eliminar este concepto?")) {
+        await eliminarConcepto(idSeleccionado);
+        alert("Concepto eliminado");
+    }
+});
+
 document.getElementById('id_tipo').addEventListener('change', actualizarMenuConceptos);
 
 function actualizarMenuConceptos() {

@@ -86,3 +86,43 @@ li {
 .es-egreso { border-left-color: var(--egreso); }
 .monto { font-weight: bold; font-size: 1.1em; }
 .btn-eliminar { background-color: var(--egreso); padding: 5px 10px; font-size: 0.8em;}
+
+/* Contenedor de los botones de concepto */
+.concept-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+    margin-bottom: 16px;
+}
+
+/* Estilo base de los botones */
+.btn-action {
+    flex: 1;
+    padding: 6px 10px;
+    font-size: 0.85rem;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-weight: 500;
+    transition: background-color 0.2s ease, opacity 0.2s ease;
+}
+
+.btn-action:hover {
+    opacity: 0.9;
+}
+
+/* Colores específicos por acción */
+.btn-add {
+    background-color: #2563eb; /* Azul primario similar al de tu botón principal */
+    color: white;
+}
+
+.btn-update {
+    background-color: #4b5563; /* Gris neutro para edición */
+    color: white;
+}
+
+.btn-delete {
+    background-color: #dc2626; /* Rojo de advertencia para eliminar */
+    color: white;
+}
