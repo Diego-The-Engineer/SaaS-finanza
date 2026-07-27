@@ -1,4 +1,5 @@
 import os
+import datetime
 from datetime import date
 from typing import Optional
 from fastapi import FastAPI, Depends, HTTPException
@@ -34,7 +35,7 @@ class ConceptoDB(Base):
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String, unique=True, index=True)
     tipo = Column(String) 
-    categoria_padre = Column(String)
+    categoria = Column(String) 
 
 class MovimientoDB(Base):
     __tablename__ = "movimientos"
@@ -57,7 +58,6 @@ class TransaccionCreate(BaseModel):
     fecha: Optional[date] = None
 
 class ConceptosCreate(BaseModel):
-    id_concepto: int
     nombre: str
     tipo: str
     categoria: str
@@ -70,7 +70,7 @@ def get_db():
     finally:
         db.close()
 
-# 5. Rutas
+# 5. Rutas de Transacciones
 @app.post("/transacciones")
 def registrar_movimiento(transaccion: TransaccionCreate, db: Session = Depends(get_db)):
     nuevo_movimiento = MovimientoDB(**transaccion.dict())
@@ -110,13 +110,14 @@ def eliminar_movimiento(id_transaccion: int, db: Session = Depends(get_db)):
     db.commit()
     return {"mensaje": f"Transacción {id_transaccion} eliminada permanentemente"}
 
+# 6. Rutas de Conceptos
 @app.post("/conceptos")
 async def crear_conceptos(concepto: ConceptosCreate, db: Session = Depends(get_db)):
     nuevo_concepto = ConceptoDB(**concepto.dict())
     db.add(nuevo_concepto)
     db.commit()
     db.refresh(nuevo_concepto)
-    return {"mensaje": "Concepto creado correctamente"}
+    return {"mensaje": "Concepto creado correctamente", "datos": nuevo_concepto}
 
 @app.delete("/conceptos/{id_concepto}")
 async def eliminar_concepto(id_concepto: int, db: Session = Depends(get_db)):
@@ -125,14 +126,14 @@ async def eliminar_concepto(id_concepto: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Concepto no encontrado")
     db.delete(concepto)
     db.commit()
-    return{"mensaje": f"Concepto {id_concepto} eliminado correctamente"}
+    return {"mensaje": f"Concepto {id_concepto} eliminado correctamente"}
 
 @app.put("/conceptos/{id_concepto}")
 def actualizar_concepto(id_concepto: int, concepto_in: ConceptosCreate, db: Session = Depends(get_db)):
     db_concepto = db.query(ConceptoDB).filter(ConceptoDB.id == id_concepto).first()
     if not db_concepto:
         raise HTTPException(status_code=404, detail="Concepto no encontrado")
-    db_concepto.id_concepto = concepto_in.id_concepto
+    
     db_concepto.nombre = concepto_in.nombre
     db_concepto.tipo = concepto_in.tipo
     db_concepto.categoria = concepto_in.categoria
