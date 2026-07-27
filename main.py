@@ -8,7 +8,7 @@ from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, 
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 
-# 1. Configuración inicial
+# 1. Configuración inicial 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 if not DATABASE_URL:
     raise ValueError("No se ha configurado la variable de entorno DATABASE_URL")
@@ -18,7 +18,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 # 2. Inicialización de la App
-app = FastAPI(title="SaaS Finanzas MVP - Fase 2")
+app = FastAPI(title="SaaS Finanzas MVP - Fase 3")
 
 # Middleware CORS (Debe ir después de definir app)
 app.add_middleware(
@@ -55,6 +55,13 @@ class TransaccionCreate(BaseModel):
     monto: float
     notas: Optional[str] = None
     fecha: Optional[date] = None
+
+class ConceptosCreate(BaseModel):
+    id_concepto: int
+    nombre: str
+    tipo: str
+    categoria: str
+
 # Dependencia DB
 def get_db():
     db = SessionLocal()
@@ -70,7 +77,7 @@ def registrar_movimiento(transaccion: TransaccionCreate, db: Session = Depends(g
     db.add(nuevo_movimiento)
     db.commit()
     db.refresh(nuevo_movimiento)
-    return {"mensaje": "¡Guardado en Postgres!", "datos": nuevo_movimiento}
+    return {"mensaje": "¡Guardado en la base de datos!", "datos": nuevo_movimiento}
 
 @app.get("/transacciones")
 def obtener_movimientos(tipo: Optional[str] = None, mes: Optional[int] = None, db: Session = Depends(get_db)):
@@ -102,6 +109,37 @@ def eliminar_movimiento(id_transaccion: int, db: Session = Depends(get_db)):
     db.delete(movimiento)
     db.commit()
     return {"mensaje": f"Transacción {id_transaccion} eliminada permanentemente"}
+
+@app.post("/conceptos")
+async def crear_conceptos(concepto: ConceptosCreate, db: Session = Depends(get_db)):
+    nuevo_concepto = ConceptoDB(**concepto.dict())
+    db.add(nuevo_concepto)
+    db.commit()
+    db.refresh(nuevo_concepto)
+    return {"mensaje": "Concepto creado correctamente"}
+
+@app.delete("/conceptos/{id_concepto}")
+async def eliminar_concepto(id_concepto: int, db: Session = Depends(get_db)):
+    concepto = db.query(ConceptoDB).filter(ConceptoDB.id == id_concepto).first()
+    if not concepto:
+        raise HTTPException(status_code=404, detail="Concepto no encontrado")
+    db.delete(concepto)
+    db.commit()
+    return{"mensaje": f"Concepto {id_concepto} eliminado correctamente"}
+
+@app.put("/conceptos/{id_concepto}")
+def actualizar_concepto(id_concepto: int, concepto_in: ConceptosCreate, db: Session = Depends(get_db)):
+    db_concepto = db.query(ConceptoDB).filter(ConceptoDB.id == id_concepto).first()
+    if not db_concepto:
+        raise HTTPException(status_code=404, detail="Concepto no encontrado")
+    db_concepto.id_concepto = concepto_in.id_concepto
+    db_concepto.nombre = concepto_in.nombre
+    db_concepto.tipo = concepto_in.tipo
+    db_concepto.categoria = concepto_in.categoria
+    
+    db.commit()
+    db.refresh(db_concepto)
+    return {"mensaje": "Concepto actualizado correctamente", "datos": db_concepto}
 
 @app.get("/conceptos")
 def obtener_conceptos(db: Session = Depends(get_db)):
