@@ -1,0 +1,32 @@
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import * as api from '../api/transacciones';
+
+const KEY = ['transacciones'];
+
+export function useMovimientos(filtros) {
+  return useQuery({
+    queryKey: [...KEY, 'lista', filtros],
+    queryFn: () => api.getTransacciones(filtros),
+    placeholderData: keepPreviousData, 
+  });
+}
+
+export function useTotalMovimientos({ tipo, mes }) {
+  return useQuery({
+    queryKey: [...KEY, 'count', { tipo, mes }],
+    queryFn: () => api.getTotalTransacciones({ tipo, mes }),
+    select: (data) => data.total,
+    placeholderData: keepPreviousData,
+  });
+}
+
+export function useMovimientoMutations() {
+  const qc = useQueryClient();
+  const onSuccess = () => qc.invalidateQueries({ queryKey: KEY });
+
+  return {
+    crear: useMutation({ mutationFn: api.createTransaccion, onSuccess }),
+    actualizar: useMutation({ mutationFn: ({ id, data }) => api.updateTransaccion(id, data), onSuccess }),
+    eliminar: useMutation({ mutationFn: api.deleteTransaccion, onSuccess }),
+  };
+}

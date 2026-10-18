@@ -52,90 +52,107 @@ def registrar_movimiento(transaccion: TransaccionCreate, db: Session = Depends(g
         monto=transaccion.monto,
         notas=transaccion.notas
     )
+    if concepto_existe.tipo != transaccion.id_tipo:
+        raise HTTPException(status_code=422, detail="El concepto no corresponde al tipo indicado")
+
+    datos = dict(
+        id_tipo=transaccion.id_tipo,
+        id_concepto=transaccion.id_concepto,
+        id_sucursal=transaccion.id_sucursal,
+        monto=transaccion.monto,
+        notas=transaccion.notas,
+    )
+    if transaccion.fecha:
+        datos["fecha"] = transaccion.fecha
+    nuevo_movimiento = MovimientoDB(**datos)
+
     db.add(nuevo_movimiento)
     db.commit()
     db.refresh(nuevo_movimiento)
     return {"mensaje": "¡Guardado en la base de datos!", "datos": nuevo_movimiento}
 
-@app.get("/transacciones")
-def obtener_movimientos(
-    tipo: Optional[str] = None, 
-    mes: Optional[int] = None, 
-    id_sucursal: Optional[int] = None,
-    limit: int = 10,
-    offset: int = 0,
-    q: Optional[str] = None,
-    db: Session = Depends(get_db)
-):
-    query = db.query(MovimientoDB)
+from datetime import date, timedelta
+from fastapi import Query
+
+def aplicar_filtros(query, tipo=None, mes=None, anio=None, id_sucursal=None, q=None, desde=None, hasta=None):
     if tipo:
         query = query.filter(MovimientoDB.id_tipo == tipo)
     if mes:
         query = query.filter(extract('month', MovimientoDB.fecha) == mes)
+    if anio:
+        query = query.filter(extract('year', MovimientoDB.fecha) == anio)
     if id_sucursal:
         query = query.filter(MovimientoDB.id_sucursal == id_sucursal)
-    if q:
-        from models import ConceptoDB
-        termino = f"%{q.strip().replace(' ', '')}%"
-        
+    if desde:
+        query = query.filter(MovimientoDB.fecha >= desde)
+    if hasta:  
+        query = query.filter(MovimientoDB.fecha < hasta + timedelta(days=1))
+    if q and q.strip():
+        termino = f"%{q.strip()}%"
         query = query.join(ConceptoDB, MovimientoDB.id_concepto == ConceptoDB.id).filter(
-            or_(
-                ConceptoDB.nombre.ilike(termino),
-                MovimientoDB.notas.ilike(termino)
-            )
+            or_(ConceptoDB.nombre.ilike(termino), MovimientoDB.notas.ilike(termino))
         )
-    if q:
-        return query.all()
+    return query
 
-    return query.offset(offset).limit(limit).all()
-
+@app.get("/transacciones")
+def obtener_movimientos(
+    tipo: Optional[str] = None, mes: Optional[int] = None, anio: Optional[int] = None,
+    id_sucursal: Optional[int] = None, q: Optional[str] = None,
+    desde: Optional[date] = None, hasta: Optional[date] = None,
+    limit: int = Query(10, ge=1, le=1000), offset: int = Query(0, ge=0),
+    db: Session = Depends(get_db),
+):
+    query = aplicar_filtros(db.query(MovimientoDB), tipo=tipo, mes=mes, anio=anio,
+                            id_sucursal=id_sucursal, q=q, desde=desde, hasta=hasta)
+    return (query.order_by(MovimientoDB.fecha.desc(), MovimientoDB.id.desc())
+                 .offset(offset).limit(limit).all())
 
 @app.get("/transacciones/count")
 def contar_transacciones(
-    tipo: Optional[str] = None, 
-    mes: Optional[int] = None, 
-    id_sucursal: Optional[int] = None,
-    db: Session = Depends(get_db)
+    tipo: Optional[str] = None, mes: Optional[int] = None, anio: Optional[int] = None,
+    id_sucursal: Optional[int] = None, q: Optional[str] = None, db: Session = Depends(get_db)
 ):
-    query = db.query(MovimientoDB)
-    if tipo:
-        query = query.filter(MovimientoDB.id_tipo == tipo)
-    if mes:
-        query = query.filter(extract('month', MovimientoDB.fecha) == mes)
-    if id_sucursal:
-        query = query.filter(MovimientoDB.id_sucursal == id_sucursal)
-        
+    query = aplicar_filtros(db.query(MovimientoDB), tipo, mes, anio, id_sucursal, q)
     return {"total": query.count()}
-
 
 @app.put("/transacciones/{id_transaccion}")
 def actualizar_movimiento(id_transaccion: int, transaccion: TransaccionCreate, db: Session = Depends(get_db)):
     movimiento = db.query(MovimientoDB).filter(MovimientoDB.id == id_transaccion).first()
     if not movimiento:
         raise HTTPException(status_code=404, detail="Transacción no encontrada")
-    
-    sucursal_existe = db.query(SucursalDB).filter(SucursalDB.id_sucursal == transaccion.id_sucursal).first()
-    if not sucursal_existe:
+
+    sucursal = db.query(SucursalDB).filter(SucursalDB.id_sucursal == transaccion.id_sucursal).first()
+    if not sucursal:
         raise HTTPException(status_code=404, detail="La sucursal seleccionada no existe")
+
+    concepto = db.query(ConceptoDB).filter(ConceptoDB.id == transaccion.id_concepto).first()
+    if not concepto:
+        raise HTTPException(status_code=404, detail="El concepto seleccionado no existe")
+    if concepto.tipo != transaccion.id_tipo:
+        raise HTTPException(status_code=422, detail="El concepto no corresponde al tipo indicado")
 
     movimiento.id_tipo = transaccion.id_tipo
     movimiento.id_concepto = transaccion.id_concepto
     movimiento.id_sucursal = transaccion.id_sucursal
     movimiento.monto = transaccion.monto
     movimiento.notas = transaccion.notas
-    
+    if transaccion.fecha:
+        movimiento.fecha = transaccion.fecha  
     db.commit()
     db.refresh(movimiento)
     return {"mensaje": "Transacción actualizada correctamente", "datos": movimiento}
 
-@app.delete("/transacciones/{id_transaccion}")
-def eliminar_movimiento(id_transaccion: int, db: Session = Depends(get_db)):
-    movimiento = db.query(MovimientoDB).filter(MovimientoDB.id == id_transaccion).first()
-    if not movimiento:
-        raise HTTPException(status_code=404, detail="Transacción no encontrada")
-    db.delete(movimiento)
+@app.delete("/conceptos/{id_concepto}")
+def eliminar_concepto(id_concepto: int, db: Session = Depends(get_db)):
+    concepto = db.query(ConceptoDB).filter(ConceptoDB.id == id_concepto).first()
+    if not concepto:
+        raise HTTPException(status_code=404, detail="Concepto no encontrado")
+    en_uso = db.query(MovimientoDB).filter(MovimientoDB.id_concepto == id_concepto).first()
+    if en_uso:
+        raise HTTPException(status_code=409, detail="El concepto tiene movimientos y no se puede eliminar")
+    db.delete(concepto)
     db.commit()
-    return {"mensaje": f"Transacción {id_transaccion} eliminada permanentemente"}
+    return {"mensaje": f"Concepto {id_concepto} eliminado correctamente"}
 
 
 @app.post("/conceptos")
