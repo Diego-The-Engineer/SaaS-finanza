@@ -2,8 +2,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { PAGE_SIZE, nombreSucursal } from '../constants';
 import { useConceptos } from '../hooks/useConceptos';
 import { useFiltrosMovimientos } from '../hooks/useFiltrosMovimientos';
-import { filtrarMovimientos, formatMonto } from '../utils/movimientos';
-import { exportarCSV } from '../utils/exportCsv';
+import { formatMonto } from '../utils/movimientos';
 import MovementForm from '../components/MovementForm';
 import ChartsPanel from '../components/ChartsPanel';
 import MovementsPanel from '../components/MovementsPanel';
@@ -11,12 +10,14 @@ import EditMovementModal from '../components/EditMovementModal';
 import { useExportarExcel } from '../hooks/useExportarExcel';
 import ExportModal from '../components/ExportModal';
 import { useMovimientos, useMovimientoMutations, useResumen, useTotalMovimientos } from '../hooks/useMovimientos';
+import { useAuth } from '../auth/AuthContext';
 
 const LISTA_VACIA = [];
 
 export default function Dashboard() {
 
   const { filtros, busqueda, setBusqueda, cambiarFiltro, irAPagina } = useFiltrosMovimientos();
+  const { cerrarSesion } = useAuth();
   const [movEditando, setMovEditando] = useState(null);
   const [mostrarExportar, setMostrarExportar] = useState(false);
   const { data: movimientos = LISTA_VACIA } = useMovimientos({ ...filtros, pageSize: PAGE_SIZE });
@@ -29,10 +30,7 @@ export default function Dashboard() {
     [conceptos]
   );
   const { exportando, exportar } = useExportarExcel(nombreConcepto);
-  const visibles = useMemo(
-    () => filtrarMovimientos(movimientos, busqueda, nombreConcepto, nombreSucursal),
-    [movimientos, busqueda, nombreConcepto]
-  );
+  
 
   const totalPaginas = Math.max(Math.ceil(total / PAGE_SIZE), 1);
   const guardarMovimiento = async (payload) => {
@@ -69,14 +67,17 @@ export default function Dashboard() {
 
   return (
     <div className="container">
-      <h1>Pre<strong>mier</strong> - Sistema de inventario</h1>
+      <div className="barra-superior">
+        <h1>Pre<strong>mier</strong> - Sistema de inventario</h1>
+        <button type="button" className="btn-salir" onClick={cerrarSesion}>Cerrar sesión</button>
+      </div>
 
       <MovementForm conceptos={conceptos} onSubmit={guardarMovimiento} guardando={crear.isPending} />
 
       <ChartsPanel resumen={resumen} nombreConcepto={nombreConcepto} />
 
       <MovementsPanel
-        movimientos={visibles}
+        movimientos={movimientos}
         filtros={filtros}
         busqueda={busqueda}
         totalPaginas={totalPaginas}

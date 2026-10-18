@@ -1,0 +1,7 @@
+.login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.login-card { width: 100%; max-width: 380px; }
+.login-subtitulo { margin: 0 0 18px; opacity: .7; }
+.login-error { color: #d32f2f; margin: 0 0 12px; font-size: .92rem; }
+.login-nota { margin: 12px 0 0; opacity: .6; font-size: .82rem; text-align: center; }
+.barra-superior { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.btn-salir { width: auto; margin: 0; padding: 8px 16px; font-size: .9rem; }

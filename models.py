@@ -1,29 +1,17 @@
-import os
 import datetime
-from datetime import date
-from typing import Optional
-from pydantic import BaseModel
-from sqlalchemy import create_engine, Column, Integer, String, Float, DateTime, extract, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
-from dotenv import load_dotenv
-load_dotenv()
 
-DATABASE_URL = os.environ.get("DATABASE_URL")
-if not DATABASE_URL:
-    raise ValueError("No se ha configurado la variable de entorno DATABASE_URL")
+from sqlalchemy import Column, DateTime, Float, ForeignKey, Integer, String
 
-engine = create_engine(DATABASE_URL)
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+from database import Base, engine
 
 
 class ConceptoDB(Base):
     __tablename__ = "conceptos"
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String, unique=True, index=True)
-    tipo = Column(String) 
-    categoria_padre = Column(String) 
+    tipo = Column(String)
+    categoria_padre = Column(String)
+
 
 class MovimientoDB(Base):
     __tablename__ = "movimientos"
@@ -35,6 +23,7 @@ class MovimientoDB(Base):
     notas = Column(String, nullable=True)
     fecha = Column(DateTime, default=datetime.datetime.utcnow)
 
+
 class SucursalDB(Base):
     __tablename__ = "sucursales"
     id_sucursal = Column(Integer, primary_key=True, index=True)
@@ -42,23 +31,11 @@ class SucursalDB(Base):
     ubicacion = Column(String)
 
 
+class UsuarioDB(Base):
+    __tablename__ = "administradores"
+    id_admin = Column(Integer, primary_key=True, index=True)
+    username = Column(String, unique=True, index=True, nullable=False)
+    password_hash = Column(String, nullable=False)
+
+
 Base.metadata.create_all(bind=engine)
-
-class TransaccionCreate(BaseModel):
-    id_tipo: str
-    id_concepto: int
-    id_sucursal: int
-    monto: float
-    notas: Optional[str] = None
-    fecha: Optional[date] = None
-
-class ConceptosCreate(BaseModel):
-    nombre: str
-    tipo: str
-    categoria_padre: str
-
-class SucursalesCreate(BaseModel):
-    nombre: str
-    ubicacion: str
-
-

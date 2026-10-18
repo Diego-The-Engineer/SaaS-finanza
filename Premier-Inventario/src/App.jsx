@@ -1,6 +1,17 @@
 import './style.css'; 
-import Dashboard from './pages/dashboard.jsx';
+import { AuthProvider, useAuth } from './auth/AuthContext';
+import Dashboard from './pages/Dashboard';
+import Login from './pages/Login';
+
+function Contenido() {
+  const { autenticado } = useAuth();
+  return autenticado ? <Dashboard /> : <Login />;
+}
 
 export default function App() {
-  return <Dashboard />;
+  return (
+    <AuthProvider>
+      <Contenido />
+    </AuthProvider>
+  );
 }

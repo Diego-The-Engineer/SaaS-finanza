@@ -11,10 +11,10 @@ export function useMovimientos(filtros) {
   });
 }
 
-export function useTotalMovimientos({ tipo, mes }) {
+export function useTotalMovimientos({ tipo, mes, q }) {
   return useQuery({
-    queryKey: [...KEY, 'count', { tipo, mes }],
-    queryFn: () => api.getTotalTransacciones({ tipo, mes }),
+    queryKey: [...KEY, 'count', { tipo, mes, q }],
+    queryFn: () => api.getTotalTransacciones({ tipo, mes, q }),
     select: (data) => data.total,
     placeholderData: keepPreviousData,
   });

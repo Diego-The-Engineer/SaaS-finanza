@@ -1,14 +1,15 @@
 import { request } from './client';
+import { parametrosBusqueda } from '../utils/movimientos';
 
-export const getTransacciones = ({ tipo, mes, pagina, pageSize }) => {
-  const params = { limit: pageSize, offset: (pagina - 1) * pageSize };
+export const getTransacciones = ({ tipo, mes, q, pagina, pageSize }) => {
+  const params = { limit: pageSize, offset: (pagina - 1) * pageSize, ...parametrosBusqueda(q) };
   if (tipo) params.tipo = tipo;
   if (mes) params.mes = parseInt(mes, 10);
   return request('/transacciones', { params });
 };
 
-export const getTotalTransacciones = ({ tipo, mes } = {}) => {
-  const params = {};
+export const getTotalTransacciones = ({ tipo, mes, q } = {}) => {
+  const params = { ...parametrosBusqueda(q) };
   if (tipo) params.tipo = tipo;
   if (mes) params.mes = parseInt(mes, 10);
   return request('/transacciones/count', { params });
