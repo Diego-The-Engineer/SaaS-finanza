@@ -1,0 +1,143 @@
+body {
+    background-color: #f4f6f9;
+    color: #333333;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+h1 {
+    color: #2c2a6b; /* Azul marino corporativo */
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+h2, h3 {
+    color: #2c2a6b;
+}
+
+.card {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 10px;
+    padding: 25px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.form-group {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #4a4a4a;
+}
+
+input, select, textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    background-color: #fff;
+    color: #333;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: #ff9800; /* Naranja corporativo */
+}
+
+button[type="submit"], .btn-action {
+    background-color: #ff9800; /* Naranja corporativo principal */
+    color: #ffffff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background 0.2s;
+    width: 100%;
+}
+
+button[type="submit"]:hover, .btn-action:hover {
+    background-color: #e68900;
+}
+
+.concept-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.btn-add { background-color: #2c2a6b; } /* Azul corporativo para acciones secundarias */
+.btn-add:hover { background-color: #1f1d4e; }
+
+.btn-update { background-color: #00acc1; }
+.btn-update:hover { background-color: #00838f; }
+
+.btn-delete { background-color: #d32f2f; }
+.btn-delete:hover { background-color: #b71c1c; }
+
+.flex-charts {
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.chart-container {
+    width: 45%;
+    min-width: 280px;
+}
+
+.filters {
+    background-color: #fafafa;
+    padding: 15px;
+    border-radius: 6px;
+    border: 1px solid #eee;
+    margin-bottom: 15px;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    width: 90%;
+    max-width: 450px;
+    background: #fff;
+}
+
+/* Color para las cajas de los movimientos con un tono azul elegante y sobrio */
+#lista-movimientos li {
+    background-color: #1e2235 !important; /* Azul marino oscuro corporativo */
+    border: 1px solid #2e3553 !important; /* Borde azul sutil */
+    color: #ffffff;
+}
+
+/* Color para la etiqueta de la fecha dentro de la caja */
+#lista-movimientos li span:first-child {
+    background-color: #151824 !important;
+    color: #a5b4fc !important;
+}
+
+/* Color para la etiqueta de la sucursal dentro de la caja */
+#lista-movimientos li span {
+    color: #d1d5db;
+}
