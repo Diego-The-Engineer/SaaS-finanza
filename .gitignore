@@ -8,3 +8,5 @@ __pycache__/
 requirements.txt
 docker-compose.yml
 scripts/
+Premier-Inventario/node_modules/
+node_modules/
