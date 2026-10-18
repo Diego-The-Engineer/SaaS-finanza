@@ -29,7 +29,8 @@ export default function Dashboard() {
     const [notas, setNotas] = useState('');
 
     const [pagina, setPagina] = useState(1);
-    const page = 5;
+    const [total, setTotal] = useState(0)
+    const page = 10;
     const [conceptosLista, setConceptosLista] = useState([]);
     const [movimientos, setMovimientos] = useState([]);
     const [filtroMes, setFiltroMes] = useState('');
@@ -91,8 +92,6 @@ export default function Dashboard() {
     const handleBusquedaChange = (e) => {
       setBusqueda(e.target.value)
     }
-
-    const numero = movimientos.length
 
     useEffect(() => {
         cargarConceptos();
@@ -270,6 +269,26 @@ export default function Dashboard() {
         link.click();
         document.body.removeChild(link);
     };
+
+    const cargarTotalRegistros = async () => {
+    try {
+        const res = await fetch(`${API_URL}/transacciones/count`);
+        if (res.ok) {
+            const data = await res.json();
+            setTotalRegistros(data.total);
+        }
+    } catch (error) {
+        console.error("Error al contar registros:", error);
+    }
+};
+
+useEffect(() => {
+    cargarConceptos();
+    cargarTotalRegistros();
+}, []);
+
+const numero = Math.ceil(total / page) || 1;
+
 
     return (
         <div className="container">

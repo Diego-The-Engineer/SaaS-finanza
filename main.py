@@ -89,6 +89,25 @@ def obtener_movimientos(
 
     return query.offset(offset).limit(limit).all()
 
+
+@app.get("/transacciones/count")
+def contar_transacciones(
+    tipo: Optional[str] = None, 
+    mes: Optional[int] = None, 
+    id_sucursal: Optional[int] = None,
+    db: Session = Depends(get_db)
+):
+    query = db.query(MovimientoDB)
+    if tipo:
+        query = query.filter(MovimientoDB.id_tipo == tipo)
+    if mes:
+        query = query.filter(extract('month', MovimientoDB.fecha) == mes)
+    if id_sucursal:
+        query = query.filter(MovimientoDB.id_sucursal == id_sucursal)
+        
+    return {"total": query.count()}
+
+
 @app.put("/transacciones/{id_transaccion}")
 def actualizar_movimiento(id_transaccion: int, transaccion: TransaccionCreate, db: Session = Depends(get_db)):
     movimiento = db.query(MovimientoDB).filter(MovimientoDB.id == id_transaccion).first()
