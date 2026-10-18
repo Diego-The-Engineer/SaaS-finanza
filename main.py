@@ -1,8 +1,8 @@
 import os
 import datetime
-from datetime import date
+from datetime import date, timedelta
 from typing import Optional
-from fastapi import FastAPI, Depends, HTTPException
+from fastapi import FastAPI, Depends, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import extract, or_, func
 from sqlalchemy.orm import Session
@@ -31,6 +31,31 @@ def get_db():
         yield db
     finally:
         db.close()
+
+def ids_desde_texto(texto: Optional[str]) -> list[int]:
+    return [int(x) for x in (texto or "").split(",") if x.strip().isdigit()]
+
+def aplicar_filtros(query, tipo=None, mes=None, anio=None, id_sucursal=None,
+                    q=None, desde=None, hasta=None, q_sucursales=None):
+    if tipo:
+        query = query.filter(MovimientoDB.id_tipo == tipo)
+    if mes:
+        query = query.filter(extract('month', MovimientoDB.fecha) == mes)
+    if anio:
+        query = query.filter(extract('year', MovimientoDB.fecha) == anio)
+    if id_sucursal:
+        query = query.filter(MovimientoDB.id_sucursal == id_sucursal)
+    if desde:
+        query = query.filter(MovimientoDB.fecha >= desde)
+    if hasta:
+        query = query.filter(MovimientoDB.fecha < hasta + timedelta(days=1))
+    if q and q.strip():
+        termino = f"%{q.strip()}%"
+        condiciones = [ConceptoDB.nombre.ilike(termino), MovimientoDB.notas.ilike(termino)]
+        if q_sucursales:
+            condiciones.append(MovimientoDB.id_sucursal.in_(q_sucursales))
+        query = query.join(ConceptoDB, MovimientoDB.id_concepto == ConceptoDB.id).filter(or_(*condiciones))
+    return query
 
 @app.get("/sucursales")
 def obtener_sucursales(db: Session = Depends(get_db)):
@@ -71,48 +96,32 @@ def registrar_movimiento(transaccion: TransaccionCreate, db: Session = Depends(g
     db.refresh(nuevo_movimiento)
     return {"mensaje": "¡Guardado en la base de datos!", "datos": nuevo_movimiento}
 
-from datetime import date, timedelta
-from fastapi import Query
-
-def aplicar_filtros(query, tipo=None, mes=None, anio=None, id_sucursal=None, q=None, desde=None, hasta=None):
-    if tipo:
-        query = query.filter(MovimientoDB.id_tipo == tipo)
-    if mes:
-        query = query.filter(extract('month', MovimientoDB.fecha) == mes)
-    if anio:
-        query = query.filter(extract('year', MovimientoDB.fecha) == anio)
-    if id_sucursal:
-        query = query.filter(MovimientoDB.id_sucursal == id_sucursal)
-    if desde:
-        query = query.filter(MovimientoDB.fecha >= desde)
-    if hasta:  
-        query = query.filter(MovimientoDB.fecha < hasta + timedelta(days=1))
-    if q and q.strip():
-        termino = f"%{q.strip()}%"
-        query = query.join(ConceptoDB, MovimientoDB.id_concepto == ConceptoDB.id).filter(
-            or_(ConceptoDB.nombre.ilike(termino), MovimientoDB.notas.ilike(termino))
-        )
-    return query
 
 @app.get("/transacciones")
 def obtener_movimientos(
     tipo: Optional[str] = None, mes: Optional[int] = None, anio: Optional[int] = None,
-    id_sucursal: Optional[int] = None, q: Optional[str] = None,
+    id_sucursal: Optional[int] = None, q: Optional[str] = None, q_sucursales: Optional[str] = None,
     desde: Optional[date] = None, hasta: Optional[date] = None,
     limit: int = Query(10, ge=1, le=1000), offset: int = Query(0, ge=0),
     db: Session = Depends(get_db),
 ):
     query = aplicar_filtros(db.query(MovimientoDB), tipo=tipo, mes=mes, anio=anio,
-                            id_sucursal=id_sucursal, q=q, desde=desde, hasta=hasta)
+                            id_sucursal=id_sucursal, q=q, desde=desde, hasta=hasta,
+                            q_sucursales=ids_desde_texto(q_sucursales))
     return (query.order_by(MovimientoDB.fecha.desc(), MovimientoDB.id.desc())
                  .offset(offset).limit(limit).all())
+
 
 @app.get("/transacciones/count")
 def contar_transacciones(
     tipo: Optional[str] = None, mes: Optional[int] = None, anio: Optional[int] = None,
-    id_sucursal: Optional[int] = None, q: Optional[str] = None, db: Session = Depends(get_db)
+    id_sucursal: Optional[int] = None, q: Optional[str] = None, q_sucursales: Optional[str] = None,
+    desde: Optional[date] = None, hasta: Optional[date] = None,
+    db: Session = Depends(get_db),
 ):
-    query = aplicar_filtros(db.query(MovimientoDB), tipo, mes, anio, id_sucursal, q)
+    query = aplicar_filtros(db.query(MovimientoDB), tipo=tipo, mes=mes, anio=anio,
+                            id_sucursal=id_sucursal, q=q, desde=desde, hasta=hasta,
+                            q_sucursales=ids_desde_texto(q_sucursales))
     return {"total": query.count()}
 
 @app.get("/transacciones/resumen")
