@@ -4,7 +4,7 @@ from datetime import date
 from typing import Optional
 from fastapi import FastAPI, Depends, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from sqlalchemy import extract, or_
+from sqlalchemy import extract, or_, func
 from sqlalchemy.orm import Session
 from models import (
     SessionLocal, 
