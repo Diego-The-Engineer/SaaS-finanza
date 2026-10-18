@@ -2,10 +2,8 @@ import { afterAll, describe, expect, it, vi } from 'vitest';
 
 const API_URL = import.meta.env.VITE_API_URL ?? 'https://saas-finanza.onrender.com';
 
-// Render (plan gratuito) puede tardar en despertar: sube el límite por defecto de 5 s
 vi.setConfig({ testTimeout: 30000, hookTimeout: 30000 });
 
-// Helper para no repetir fetch + headers + JSON en cada prueba
 async function llamar(ruta, method = 'GET', body) {
   const res = await fetch(`${API_URL}${ruta}`, {
     method,
@@ -17,50 +15,48 @@ async function llamar(ruta, method = 'GET', body) {
   try {
     data = texto ? JSON.parse(texto) : null;
   } catch {
-    data = { raw: texto }; // el servidor devolvió algo que no es JSON (p. ej. "Internal Server Error")
+    data = { raw: texto };
   }
   return { res, data, texto };
 }
 
 describe('Pruebas de Integración - Rutas HTTP de Finanzas', () => {
-    let conceptoId = null;
-    let movimientoId = null;
-    const nombreConcepto = `Concepto Test ${Date.now()}`; // único en cada corrida
-    const sucursalId = 1;
+  let conceptoId = null;
+  let movimientoId = null;
+  const nombreConcepto = `Concepto Test ${Date.now()}`;
+  const sucursalId = 1;
 
-  // Limpieza por si una prueba falla a la mitad y deja datos de prueba en la base.
-  // Primero el movimiento: el servidor no deja borrar un concepto que está en uso.
   afterAll(async () => {
     if (movimientoId) await llamar(`/transacciones/${movimientoId}`, 'DELETE').catch(() => {});
     if (conceptoId) await llamar(`/conceptos/${conceptoId}`, 'DELETE').catch(() => {});
   });
 
   it('Debe crear un concepto nuevo (POST /conceptos)', async () => {
-  const { res, data, texto } = await llamar('/conceptos', 'POST', {
-    nombre: nombreConcepto,
-    tipo: 'Ingreso',
-    categoria_padre: '',
+    const { res, data, texto } = await llamar('/conceptos', 'POST', {
+      nombre: nombreConcepto,
+      tipo: 'Ingreso',
+      categoria_padre: '',
+    });
+
+    expect([200, 201], `POST /conceptos respondió ${res.status}: ${texto}`).toContain(res.status);
+    expect(data.datos.nombre).toBe(nombreConcepto);
+    conceptoId = data.datos.id;
+    expect(conceptoId).toBeTruthy();
   });
 
-  // Si falla, el mensaje muestra el estado y lo que respondió el servidor
-  expect([200, 201], `POST /conceptos respondió ${res.status}: ${texto}`).toContain(res.status);
-  expect(data.datos.nombre).toBe(nombreConcepto);
-  conceptoId = data.datos.id;
-  expect(conceptoId).toBeTruthy();
-});
+  it('Debe editar un concepto existente (PUT /conceptos/:id)', async () => {
+    expect(conceptoId, 'No hay conceptoId: falló la prueba de crear concepto').toBeTruthy();
 
-it('Debe editar un concepto existente (PUT /conceptos/:id)', async () => {
-  expect(conceptoId, 'No hay conceptoId: falló la prueba de crear concepto').toBeTruthy();
+    const { res, data, texto } = await llamar(`/conceptos/${conceptoId}`, 'PUT', {
+      nombre: `${nombreConcepto} editado`,
+      tipo: 'Ingreso',
+      categoria_padre: 'Test',
+    });
 
-  const { res, data, texto } = await llamar(`/conceptos/${conceptoId}`, 'PUT', {
-    nombre: `${nombreConcepto} editado`,
-    tipo: 'Ingreso',
-    categoria_padre: 'Test',
+    expect(res.status, `PUT /conceptos respondió ${res.status}: ${texto}`).toBe(200);
+    expect(data.datos.nombre).toBe(`${nombreConcepto} editado`);
   });
 
-  expect(res.status, `PUT /conceptos respondió ${res.status}: ${texto}`).toBe(200);
-  expect(data.datos.nombre).toBe(`${nombreConcepto} editado`);
-});
   it('Debe crear un movimiento (POST /transacciones)', async () => {
     expect(conceptoId, 'No hay conceptoId: fallaron las pruebas de concepto').toBeTruthy();
 
@@ -102,7 +98,7 @@ it('Debe editar un concepto existente (PUT /conceptos/:id)', async () => {
     const { res } = await llamar(`/transacciones/${movimientoId}`, 'DELETE');
 
     expect([200, 204]).toContain(res.status);
-    movimientoId = null; // ya no hay nada que limpiar en afterAll
+    movimientoId = null;
   });
 
   it('Debe eliminar el concepto (DELETE /conceptos/:id)', async () => {

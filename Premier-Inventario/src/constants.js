@@ -7,7 +7,7 @@ export const SUCURSALES = [
   { id: 2, nombre: 'SUC. PT RIO GRANDE' },
   { id: 3, nombre: 'SUC. JUQUILA 1' },
   { id: 4, nombre: 'SUC. JUQUILA 2' },
-  { id: 5, nombre: 'SUC. PUERTO ESCONDIDO' },
+  { id: 5, nombre: 'SUC. PUERTO ESCONDIDO (CHEDRAUI)' },
   { id: 6, nombre: 'SUC. POCHUTLA' },
   { id: 7, nombre: 'SUC. PT SANTA MARIA' },
   { id: 8, nombre: 'SUC. SANTA ROSA' },
@@ -35,3 +35,5 @@ export const MESES = [
 
 const sucursalPorId = new Map(SUCURSALES.map((s) => [s.id, s.nombre]));
 export const nombreSucursal = (id) => sucursalPorId.get(id) ?? 'Sin sucursal';
+
+export const OPCIONES_SUCURSAL = SUCURSALES.map((s) => ({ value: s.id, label: s.nombre }));

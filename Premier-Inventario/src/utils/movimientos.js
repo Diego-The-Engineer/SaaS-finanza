@@ -15,12 +15,9 @@ export function filtrarMovimientos(movimientos, busqueda, nombreConcepto, nombre
   );
 }
 
-export function agruparPorConcepto(movimientos, tipo, nombreConcepto) {
-  return movimientos
-    .filter((m) => m.id_tipo === tipo)
-    .reduce((acc, m) => {
-      const nombre = nombreConcepto(m.id_concepto);
-      acc[nombre] = (acc[nombre] || 0) + Number(m.monto);
-      return acc;
-    }, {});
+export function resumenPorTipo(resumen, tipo, nombreConcepto) {
+  return resumen
+    .filter((r) => r.id_tipo === tipo)
+    .map((r) => ({ nombre: nombreConcepto(r.id_concepto), total: Number(r.total) }))
+    .sort((a, b) => b.total - a.total);
 }

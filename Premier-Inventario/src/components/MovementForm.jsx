@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { SUCURSALES, TIPOS } from '../constants';
 import ConceptActions from './ConceptActions';
+import SelectBuscable from './SelectBuscable';
+import { OPCIONES_SUCURSAL, TIPOS } from '../constants';
+import CampoMonto from './CampoMonto';
 const hoy = () => new Date().toLocaleDateString('en-CA');
 
 const estadoInicial = () => ({
@@ -19,9 +21,14 @@ export default function MovementForm({ conceptos, onSubmit, guardando }) {
   const cambiarTipo = (e) => setForm((prev) => ({ ...prev, tipo: e.target.value, conceptoId: '' }));
 
   const conceptosDelTipo = conceptos.filter((c) => c.tipo === form.tipo);
+  const opcionesConcepto = conceptosDelTipo.map((c) => ({ value: c.id, label: c.nombre }));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!form.sucursalId || !form.conceptoId) {
+      alert('Selecciona la sucursal y el concepto.');
+      return;
+    }
     const ok = await onSubmit({
       id_tipo: form.tipo,
       id_concepto: parseInt(form.conceptoId, 10),
@@ -37,14 +44,16 @@ export default function MovementForm({ conceptos, onSubmit, guardando }) {
     <div className="card">
       <h2>Registrar Movimiento</h2>
       <form id="form-movimiento" onSubmit={handleSubmit}>
+        
         <div className="form-group">
           <label htmlFor="id_sucursal">Sucursal</label>
-          <select id="id_sucursal" value={form.sucursalId} onChange={cambiar('sucursalId')} required>
-            <option value="">Selecciona sucursal...</option>
-            {SUCURSALES.map((s) => (
-              <option key={s.id} value={s.id}>{s.nombre}</option>
-            ))}
-          </select>
+          <SelectBuscable
+            id="id_sucursal"
+            opciones={OPCIONES_SUCURSAL}
+            value={form.sucursalId}
+            onChange={(id) => setForm((prev) => ({ ...prev, sucursalId: id }))}
+            placeholder="Buscar sucursal..."
+          />
         </div>
 
         <div className="form-group">
@@ -59,12 +68,14 @@ export default function MovementForm({ conceptos, onSubmit, guardando }) {
 
         <div className="form-group">
           <label htmlFor="id_concepto">Concepto</label>
-          <select id="id_concepto" value={form.conceptoId} onChange={cambiar('conceptoId')} required disabled={!form.tipo}>
-            <option value="">{form.tipo ? 'Selecciona un concepto...' : 'Primero selecciona el Tipo...'}</option>
-            {conceptosDelTipo.map((c) => (
-              <option key={c.id} value={c.id}>{c.nombre}</option>
-            ))}
-          </select>
+          <SelectBuscable
+            id="id_concepto"
+            opciones={opcionesConcepto}
+            value={form.conceptoId}
+            onChange={(id) => setForm((prev) => ({ ...prev, conceptoId: id }))}
+            placeholder={form.tipo ? 'Buscar concepto...' : 'Primero selecciona el Tipo...'}
+            disabled={!form.tipo}
+          />
 
           <ConceptActions
             conceptoId={form.conceptoId}
@@ -75,7 +86,12 @@ export default function MovementForm({ conceptos, onSubmit, guardando }) {
 
         <div className="form-group">
           <label htmlFor="monto">Monto ($)</label>
-          <input type="number" id="monto" step="10" min={0} value={form.monto} onChange={cambiar('monto')} required />
+          <CampoMonto
+            id="monto"
+            value={form.monto}
+            onChange={(valor) => setForm((prev) => ({ ...prev, monto: valor }))}
+            required
+          />
         </div>
 
         <div className="form-group">

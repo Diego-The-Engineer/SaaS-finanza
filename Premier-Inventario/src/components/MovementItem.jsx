@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { formatMonto, soloFecha } from '../utils/movimientos';
-
+import {Trash, SquarePen} from 'lucide-react'
 export default function MovementItem({ movimiento, concepto, sucursal, onEditar, onEliminar }) {
   const [notaVisible, setNotaVisible] = useState(false);
   const tieneNota = Boolean(movimiento.notas?.trim());
@@ -31,10 +31,10 @@ export default function MovementItem({ movimiento, concepto, sucursal, onEditar,
           )}
 
           <button type="button" className="mov-btn mov-btn--editar" onClick={() => onEditar(movimiento)}>
-            ✎ Editar
+            <SquarePen />
           </button>
           <button type="button" className="mov-btn mov-btn--eliminar" onClick={() => onEliminar(movimiento)}>
-            🗑 Eliminar
+            <Trash />
           </button>
         </div>
       </div>

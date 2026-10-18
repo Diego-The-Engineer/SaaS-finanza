@@ -115,6 +115,23 @@ def contar_transacciones(
     query = aplicar_filtros(db.query(MovimientoDB), tipo, mes, anio, id_sucursal, q)
     return {"total": query.count()}
 
+@app.get("/transacciones/resumen")
+def resumen_por_concepto(
+    mes: Optional[int] = None, anio: Optional[int] = None,
+    id_sucursal: Optional[int] = None,
+    desde: Optional[date] = None, hasta: Optional[date] = None,
+    db: Session = Depends(get_db),
+):
+    query = aplicar_filtros(
+        db.query(MovimientoDB.id_tipo, MovimientoDB.id_concepto, func.sum(MovimientoDB.monto).label("total")),
+        mes=mes, anio=anio, id_sucursal=id_sucursal, desde=desde, hasta=hasta,
+    )
+    filas = query.group_by(MovimientoDB.id_tipo, MovimientoDB.id_concepto).all()
+    return [
+        {"id_tipo": tipo, "id_concepto": concepto, "total": float(total or 0)}
+        for tipo, concepto, total in filas
+    ]
+
 @app.put("/transacciones/{id_transaccion}")
 def actualizar_movimiento(id_transaccion: int, transaccion: TransaccionCreate, db: Session = Depends(get_db)):
     movimiento = db.query(MovimientoDB).filter(MovimientoDB.id == id_transaccion).first()

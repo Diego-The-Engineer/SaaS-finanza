@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Modal from './Modal';
 import { SUCURSALES } from '../constants';
-
+import CampoMonto from './CampoMonto';
 export default function EditMovementModal({ movimiento, onGuardar, onCancelar, guardando }) {
   const [form, setForm] = useState(() => ({
     sucursalId: movimiento.id_sucursal ?? '',
@@ -37,7 +37,10 @@ export default function EditMovementModal({ movimiento, onGuardar, onCancelar, g
 
       <div className="form-group">
         <label>Monto ($)</label>
-        <input type="number" step="0.01" min={0} value={form.monto} onChange={cambiar('monto')} />
+        <CampoMonto
+          value={form.monto}
+          onChange={(valor) => setForm((prev) => ({ ...prev, monto: valor }))}
+        />
       </div>
 
       <div className="form-group">

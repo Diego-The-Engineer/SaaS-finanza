@@ -30,3 +30,11 @@ export function useMovimientoMutations() {
     eliminar: useMutation({ mutationFn: api.deleteTransaccion, onSuccess }),
   };
 }
+
+export function useResumen({ mes }) {
+  return useQuery({
+    queryKey: [...KEY, 'resumen', { mes }],
+    queryFn: () => api.getResumen({ mes }),
+    placeholderData: keepPreviousData,
+  });
+}

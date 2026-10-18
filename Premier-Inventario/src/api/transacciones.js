@@ -31,3 +31,9 @@ export async function getTodasTransacciones({ tipo, desde, hasta }) {
     if (lote.length < LOTE) return todas;
   }
 }
+
+export const getResumen = ({ mes } = {}) => {
+  const params = {};
+  if (mes) params.mes = parseInt(mes, 10);
+  return request('/transacciones/resumen', { params });
+};

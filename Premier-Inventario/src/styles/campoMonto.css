@@ -1,0 +1,5 @@
+.campo-monto { display: flex; gap: 6px; align-items: stretch; }
+.campo-monto input { flex: 1; -moz-appearance: textfield; appearance: textfield; }
+.campo-monto input::-webkit-outer-spin-button,
+.campo-monto input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.campo-monto button { width: auto; margin: 0; padding: 0 16px; font-size: 1.2rem; }

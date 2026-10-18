@@ -1,7 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import { PAGE_SIZE, nombreSucursal } from '../constants';
 import { useConceptos } from '../hooks/useConceptos';
-import { useMovimientos, useMovimientoMutations, useTotalMovimientos } from '../hooks/useMovimientos';
 import { useFiltrosMovimientos } from '../hooks/useFiltrosMovimientos';
 import { filtrarMovimientos, formatMonto } from '../utils/movimientos';
 import { exportarCSV } from '../utils/exportCsv';
@@ -11,13 +10,17 @@ import MovementsPanel from '../components/MovementsPanel';
 import EditMovementModal from '../components/EditMovementModal';
 import { useExportarExcel } from '../hooks/useExportarExcel';
 import ExportModal from '../components/ExportModal';
+import { useMovimientos, useMovimientoMutations, useResumen, useTotalMovimientos } from '../hooks/useMovimientos';
 
 const LISTA_VACIA = [];
+
 export default function Dashboard() {
+
   const { filtros, busqueda, setBusqueda, cambiarFiltro, irAPagina } = useFiltrosMovimientos();
   const [movEditando, setMovEditando] = useState(null);
   const [mostrarExportar, setMostrarExportar] = useState(false);
   const { data: movimientos = LISTA_VACIA } = useMovimientos({ ...filtros, pageSize: PAGE_SIZE });
+  const { data: resumen = LISTA_VACIA } = useResumen(filtros);
   const { data: total = 0 } = useTotalMovimientos(filtros);
   const { crear, actualizar, eliminar } = useMovimientoMutations();
   const { data: conceptos = LISTA_VACIA } = useConceptos();
@@ -70,7 +73,7 @@ export default function Dashboard() {
 
       <MovementForm conceptos={conceptos} onSubmit={guardarMovimiento} guardando={crear.isPending} />
 
-      <ChartsPanel movimientos={movimientos} nombreConcepto={nombreConcepto} />
+      <ChartsPanel resumen={resumen} nombreConcepto={nombreConcepto} />
 
       <MovementsPanel
         movimientos={visibles}
