@@ -1,3 +1,4 @@
+"""Esquemas de entrada y salida de la API (Pydantic)."""
 from datetime import date
 from typing import Optional
 
@@ -21,7 +22,12 @@ class ConceptosCreate(BaseModel):
 
 class SucursalesCreate(BaseModel):
     nombre: str
-    ubicacion: str
+    ubicacion: Optional[str] = None
+
+
+class SucursalUpdate(BaseModel):
+    nombre: Optional[str] = None
+    ubicacion: Optional[str] = None
 
 
 class LoginIn(BaseModel):
