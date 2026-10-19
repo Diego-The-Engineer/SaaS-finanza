@@ -16,6 +16,8 @@ export const SUCURSALES = [
   { id: 11, nombre: 'SUC. PT MACROPLAZA' },
   { id: 12, nombre: 'SUC. PT BAHIAS DE HUATULCO' },
   { id: 13, nombre: 'SUC. RIO GRANDE' },
+  { id: 14, nombre: 'OFICINAS' },
+  { id: 15, nombre: 'SUC. PLAZA MAZARI' },
 ];
 
 export const MESES = [
