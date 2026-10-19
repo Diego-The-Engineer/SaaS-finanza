@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import ConceptActions from './ConceptActions';
 import SelectBuscable from './SelectBuscable';
-import { OPCIONES_SUCURSAL, TIPOS } from '../constants';
-import CampoMonto from './CampoMonto';
+import SucursalActions from './SucursalActions';
+import { TIPOS } from '../constants';
+
 const hoy = () => new Date().toLocaleDateString('en-CA');
 
 const estadoInicial = () => ({
@@ -14,7 +15,7 @@ const estadoInicial = () => ({
   notas: '',
 });
 
-export default function MovementForm({ conceptos, onSubmit, guardando }) {
+export default function MovementForm({ conceptos, sucursales, onSubmit, guardando }) {
   const [form, setForm] = useState(estadoInicial);
 
   const cambiar = (campo) => (e) => setForm((prev) => ({ ...prev, [campo]: e.target.value }));
@@ -22,6 +23,7 @@ export default function MovementForm({ conceptos, onSubmit, guardando }) {
 
   const conceptosDelTipo = conceptos.filter((c) => c.tipo === form.tipo);
   const opcionesConcepto = conceptosDelTipo.map((c) => ({ value: c.id, label: c.nombre }));
+  const opcionesSucursal = sucursales?.map((s) => ({ value: s.id_sucursal, label: s.nombre })) || [];
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,10 +51,16 @@ export default function MovementForm({ conceptos, onSubmit, guardando }) {
           <label htmlFor="id_sucursal">Sucursal</label>
           <SelectBuscable
             id="id_sucursal"
-            opciones={OPCIONES_SUCURSAL}
+            opciones={opcionesSucursal}
             value={form.sucursalId}
             onChange={(id) => setForm((prev) => ({ ...prev, sucursalId: id }))}
             placeholder="Buscar sucursal..."
+          />
+          <SucursalActions 
+            sucursales={sucursales}
+            sucursalId={form.sucursalId} 
+            onCreada={(nuevaId) => setForm((prev) => ({ ...prev, sucursalId: nuevaId }))}
+            onEliminada={() => setForm((prev) => ({ ...prev, sucursalId: '' }))}
           />
         </div>
 
@@ -76,7 +84,6 @@ export default function MovementForm({ conceptos, onSubmit, guardando }) {
             placeholder={form.tipo ? 'Buscar concepto...' : 'Primero selecciona el Tipo...'}
             disabled={!form.tipo}
           />
-
           <ConceptActions
             conceptoId={form.conceptoId}
             conceptos={conceptos}
@@ -86,12 +93,7 @@ export default function MovementForm({ conceptos, onSubmit, guardando }) {
 
         <div className="form-group">
           <label htmlFor="monto">Monto ($)</label>
-          <CampoMonto
-            id="monto"
-            value={form.monto}
-            onChange={(valor) => setForm((prev) => ({ ...prev, monto: valor }))}
-            required
-          />
+          <input type="number" id="monto" step="10" min={0} value={form.monto} onChange={cambiar('monto')} required />
         </div>
 
         <div className="form-group">

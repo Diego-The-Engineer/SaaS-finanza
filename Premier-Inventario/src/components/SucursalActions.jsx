@@ -2,9 +2,8 @@ import { useState } from 'react';
 import { useSucursalMutations } from '../hooks/useSucursales';
 import SucursalModal from './SucursalModal';
 
-// Responsabilidad: agregar, editar y eliminar sucursales desde el formulario de movimientos.
 export default function SucursalActions({ sucursalId, sucursales, onCreada, onEliminada }) {
-  const [modal, setModal] = useState(null); // null | 'crear' | 'editar'
+  const [modal, setModal] = useState(null); 
   const { crear, actualizar, eliminar } = useSucursalMutations();
 
   const actual = sucursales.find((s) => s.id_sucursal === Number(sucursalId));
@@ -39,7 +38,7 @@ export default function SucursalActions({ sucursalId, sucursales, onCreada, onEl
             crear.mutate(data, {
               onSuccess: (respuesta) => {
                 cerrar();
-                onCreada?.(String(respuesta.datos.id_sucursal)); // la deja seleccionada en el formulario
+                onCreada?.(String(respuesta.datos.id_sucursal)); 
               },
               onError: avisarError,
             })

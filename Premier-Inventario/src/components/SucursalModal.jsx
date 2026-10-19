@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Modal from './Modal';
 
-// Un solo modal para agregar y editar sucursales.
+
 export default function SucursalModal({ titulo, inicial, onGuardar, onCancelar, guardando }) {
   const [form, setForm] = useState(() => ({
     nombre: inicial?.nombre ?? '',

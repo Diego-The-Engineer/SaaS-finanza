@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { PAGE_SIZE, nombreSucursal } from '../constants';
 import { useConceptos } from '../hooks/useConceptos';
 import { useFiltrosMovimientos } from '../hooks/useFiltrosMovimientos';
@@ -11,28 +11,31 @@ import { useExportarExcel } from '../hooks/useExportarExcel';
 import ExportModal from '../components/ExportModal';
 import { useMovimientos, useMovimientoMutations, useResumen, useTotalMovimientos } from '../hooks/useMovimientos';
 import { useAuth } from '../auth/AuthContext';
+import { useSucursales } from '../hooks/useSucursales';
 
 const LISTA_VACIA = [];
 
 export default function Dashboard() {
-
   const { filtros, busqueda, setBusqueda, cambiarFiltro, irAPagina } = useFiltrosMovimientos();
   const { cerrarSesion } = useAuth();
   const [movEditando, setMovEditando] = useState(null);
   const [mostrarExportar, setMostrarExportar] = useState(false);
+  
   const { data: movimientos = LISTA_VACIA } = useMovimientos({ ...filtros, pageSize: PAGE_SIZE });
   const { data: resumen = LISTA_VACIA } = useResumen(filtros);
   const { data: total = 0 } = useTotalMovimientos(filtros);
   const { crear, actualizar, eliminar } = useMovimientoMutations();
   const { data: conceptos = LISTA_VACIA } = useConceptos();
+  const { data: sucursales = LISTA_VACIA } = useSucursales();
+
   const nombreConcepto = useCallback(
     (id) => conceptos.find((c) => c.id === id)?.nombre ?? `Concepto #${id}`,
     [conceptos]
   );
   const { exportando, exportar } = useExportarExcel(nombreConcepto);
   
-
   const totalPaginas = Math.max(Math.ceil(total / PAGE_SIZE), 1);
+  
   const guardarMovimiento = async (payload) => {
     try {
       await crear.mutateAsync(payload);
@@ -52,18 +55,17 @@ export default function Dashboard() {
       }
     );
 
-    const eliminarMovimiento = (mov) => {
+  const eliminarMovimiento = (mov) => {
     const detalle = `${nombreConcepto(mov.id_concepto)} por ${formatMonto(mov.monto)}`;
     if (!window.confirm(`¿Eliminar este movimiento?\n${detalle}`)) return;
 
     eliminar.mutate(mov.id, {
-            onSuccess: () => {
-
-            if (movimientos.length === 1 && filtros.pagina > 1) irAPagina(filtros.pagina - 1);
-            },
-            onError: (e) => alert(`Error al eliminar: ${e.message}`),
-        });
-    };
+        onSuccess: () => {
+          if (movimientos.length === 1 && filtros.pagina > 1) irAPagina(filtros.pagina - 1);
+        },
+        onError: (e) => alert(`Error al eliminar: ${e.message}`),
+    });
+  };
 
   return (
     <div className="container">
@@ -72,7 +74,12 @@ export default function Dashboard() {
         <button type="button" className="btn-salir" onClick={cerrarSesion}>Cerrar sesión</button>
       </div>
 
-      <MovementForm conceptos={conceptos} onSubmit={guardarMovimiento} guardando={crear.isPending} />
+      <MovementForm 
+        conceptos={conceptos} 
+        sucursales={sucursales} 
+        onSubmit={guardarMovimiento} 
+        guardando={crear.isPending} 
+      />
 
       <ChartsPanel resumen={resumen} nombreConcepto={nombreConcepto} />
 
@@ -101,15 +108,16 @@ export default function Dashboard() {
           onCancelar={() => setMovEditando(null)}
         />
       )}
+      
       {mostrarExportar && (
         <ExportModal
             exportando={exportando}
             onCancelar={() => setMostrarExportar(false)}
             onExportar={async (opciones) => {
-            if (await exportar(opciones)) setMostrarExportar(false);
+              if (await exportar(opciones)) setMostrarExportar(false);
             }}
         />
-    )}
+      )}
     </div>
   );
 }
