@@ -68,7 +68,7 @@ export default function Dashboard() {
   return (
     <div className="container">
       <div className="barra-superior">
-        <h1>Pre<strong>mier</strong> - Sistema de inventario</h1>
+        <h1><span className="naranja">Pre</span>mier</h1>
         <button type="button" className="btn-salir" onClick={cerrarSesion}>Cerrar sesión</button>
       </div>
 

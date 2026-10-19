@@ -25,7 +25,7 @@ export default function Login() {
   return (
     <div className="login-wrap">
       <div className="card login-card">
-        <h1>Pre<strong>mier</strong></h1>
+        <h1><span className="naranja">Pre</span>mier</h1>
         <p className="login-subtitulo">Inicia sesión para continuar</p>
 
         <form onSubmit={handleSubmit}>
