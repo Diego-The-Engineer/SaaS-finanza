@@ -41,3 +41,21 @@
 .export-opciones legend { padding: 0 6px; font-weight: 600; }
 .export-opciones label { display: flex; align-items: center; gap: 8px; margin: 6px 0; cursor: pointer; }
 .export-opciones input[type="radio"] { width: auto; margin: 0; }
+
+.concept-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.concept-actions button {
+  flex: 1 1 auto; 
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .concept-actions {
+    flex-direction: column;
+  }
+}
