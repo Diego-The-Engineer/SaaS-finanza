@@ -2,9 +2,8 @@ import { useState } from 'react';
 import { useConceptoMutations } from '../hooks/useConceptos';
 import ConceptModal from './ConceptModal';
 
-// Responsabilidad: CRUD de conceptos sobre el concepto seleccionado en el formulario.
 export default function ConceptActions({ conceptoId, conceptos, onEliminado }) {
-  const [modal, setModal] = useState(null); // null | 'crear' | 'editar'
+  const [modal, setModal] = useState(null); 
   const { crear, actualizar, eliminar } = useConceptoMutations();
 
   const actual = conceptos.find((c) => c.id === Number(conceptoId));
