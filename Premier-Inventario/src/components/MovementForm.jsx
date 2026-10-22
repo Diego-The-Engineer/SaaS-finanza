@@ -93,7 +93,7 @@ export default function MovementForm({ conceptos, sucursales, onSubmit, guardand
 
         <div className="form-group">
           <label htmlFor="monto">Monto ($)</label>
-          <input type="number" id="monto" step="10" min={0} value={form.monto} onChange={cambiar('monto')} required />
+          <input type="number" id="monto" step="0.01" min={0} value={form.monto} onChange={cambiar('monto')} required />
         </div>
 
         <div className="form-group">
